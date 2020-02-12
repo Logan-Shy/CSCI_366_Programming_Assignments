@@ -26,30 +26,22 @@
  * @return length of the file in bytes
  */
 int get_file_length(ifstream *file){
-   const auto begin = file.tellg();
-   file.seekg(0, ios::end);
-   const auto end = file.tellg();
+   const auto begin = file->tellg();
+   file->seekg(0, ios::end);
+   const auto end = file->tellg();
    const auto fsize = (end - begin);
 }
 
-class Server {
-   public:
-      int board_size;
-
-   private:
-      ifstream p1_setup_board;
-      ifstream p2_setup_board;
-}
 
 
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
-   this.board_size = board_size;
-   this.p1_setup_board.open(p1_setup_board);
-   while () 
+   this->board_size = board_size;
+   this->p1_setup_board.open(p1_setup_board);
+   // while () 
 
-   this.p2_setup_board.open(p2_setup_board);
+   this->p2_setup_board.open(p2_setup_board);
 }
 
 
