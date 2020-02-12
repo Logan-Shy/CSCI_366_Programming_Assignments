@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CSCI 466 PA1 - Basic Battleship Game
 
 ## Instructions
@@ -127,3 +128,9 @@ Note that for grading we will use out own `tests.cpp` and full size setup board 
 
 
 
+=======
+# CSCI 366 Programming Assignments
+Programming Assignments for the CSCI 366: Computer Systems course at Montana State University
+
+Please choose a branch corresponding to a programming assignment.
+>>>>>>> 6ae05b5b6526b6dc254fe7a2d203a1cc14f5f613
