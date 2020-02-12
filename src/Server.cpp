@@ -18,24 +18,48 @@
 #include "common.hpp"
 #include "Server.hpp"
 
-
 /**
  * Calculate the length of a file (helper function)
+ * (Code snippets found at https://www.bfilipek.com/2019/01/filesize.html)
  *
  * @param file - the file whose length we want to query
  * @return length of the file in bytes
  */
 int get_file_length(ifstream *file){
+   const auto begin = file.tellg();
+   file.seekg(0, ios::end);
+   const auto end = file.tellg();
+   const auto fsize = (end - begin);
+}
+
+class Server {
+   public:
+      int board_size;
+
+   private:
+      ifstream p1_setup_board;
+      ifstream p2_setup_board;
 }
 
 
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
+   this.board_size = board_size;
+   this.p1_setup_board.open(p1_setup_board);
+   while () 
+
+   this.p2_setup_board.open(p2_setup_board);
 }
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
+   //Check if player number and shot are within bounds
+   if (player > 2 || player < 1) {
+      return OUT_OF_BOUNDS;
+   } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
+      return OUT_OF_BOUNDS;
+   }
 }
 
 
