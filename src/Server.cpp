@@ -30,6 +30,7 @@ int get_file_length(ifstream *file){
    file->seekg(0, ios::end);
    const auto end = file->tellg();
    const auto fsize = (end - begin);
+   return fsize;
 }
 
 
@@ -52,6 +53,36 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
       return OUT_OF_BOUNDS;
    }
+
+   string line = "";
+   char shot = 'x';
+
+   switch(player)
+   {
+      case 1:  
+         for(int i = 0; i < y; i++){
+            getline(p1_setup_board, line);
+         }
+         shot = line[x];
+      
+      case 2:
+         for(int i = 0; i < y; i++){
+            getline(p2_setup_board, line);
+         }
+         shot = line[x];
+   }
+   try {
+      if (shot == 'x') throw "Something went wrong";
+   } catch (string e) {
+      cout << e;
+   }
+
+   if (shot == '_') {
+      return MISS;
+   } else {
+      return HIT;
+   }
+   
 }
 
 
