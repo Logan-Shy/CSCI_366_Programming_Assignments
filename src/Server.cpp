@@ -26,11 +26,19 @@
  * @return length of the file in bytes
  */
 int get_file_length(ifstream *file){
-   const auto begin = file->tellg();
-   file->seekg(0, ios::end);
-   const auto end = file->tellg();
-   const auto fsize = (end - begin);
-   return fsize;
+   streamsize fileSize = 0;
+   if(file->is_open()){
+      file->seekg(0, ios::end);
+      fileSize = file->tellg();
+      file->close();
+   } else {
+      try{
+         throw "File not opened properly";
+      } catch(string e){
+         cout << e << endl;
+      }
+   }
+   return fileSize;
 }
 
 
@@ -87,5 +95,47 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
 
 int Server::process_shot(unsigned int player) {
-   return NO_SHOT_FILE;
+   int filesize = 0;
+
+
+   if (player == 1){
+      ifstream file("src/shots/player_1.shot.json");
+      if (file) {//file exists and is open
+         filesize = get_file_length(&file);
+         cout << "shot filesize from player 1:" << filesize << endl;
+         if (filesize < 3) {
+            file.close();
+            return NO_SHOT_FILE;
+         } else { //file is large enough to extract coordinates
+            file.close();
+            return SHOT_FILE_PROCESSED;
+         }
+      } else {
+         try{
+            throw "Error opening file";
+         } catch(string e) {
+            cout << e << endl;
+         }
+      }
+   } else if (player == 2) {
+      ifstream file("src/shots/player_2.shot.json");
+      if (file) {//file exists and is open
+         filesize = get_file_length(&file);
+         cout << "shot filesize from player 2:" << filesize << endl;
+         if (filesize < 3) {
+            file.close();
+            return NO_SHOT_FILE;
+         } else { //file is large enough to extract coordinates
+            file.close();
+            // return SHOT_FILE_PROCESSED;
+            return NO_SHOT_FILE;
+         }
+      } else {
+         try{
+            throw "Error opening file";
+         } catch(string e) {
+            cout << e << endl;
+         }
+      }
+   }
 }
