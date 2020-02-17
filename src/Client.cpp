@@ -30,10 +30,12 @@ void Client::fire(unsigned int x, unsigned int y) {
 
 
 bool Client::result_available() {
+    return false;
 }
 
 
 int Client::get_result() {
+    return 0;
 }
 
 
@@ -43,4 +45,5 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
 
 string Client::render_action_board(){
+    return "";
 }
