@@ -25,3 +25,6 @@
 #define BOARD_SIZE 10
 
 #endif //BATTLESHIP_COMMON_H
+
+// Shot file example:
+// [{"x" : 4, "y" : 7}]
