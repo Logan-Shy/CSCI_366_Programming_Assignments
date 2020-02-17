@@ -58,3 +58,4 @@ build/*
 CMakeCache.txt
 CMakeFiles/*
 src/shots/*
+src/results/*
