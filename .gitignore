@@ -59,3 +59,4 @@ CMakeCache.txt
 CMakeFiles/*
 src/shots/*
 src/results/*
+*.result.json

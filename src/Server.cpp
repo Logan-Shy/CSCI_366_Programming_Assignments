@@ -56,10 +56,9 @@ int get_file_length(ifstream *file){
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
+   //Assign board sizes and open setup boards
    this->board_size = board_size;
    this->p1_setup_board.open(p1_setup_board);
-   // while () 
-
    this->p2_setup_board.open(p2_setup_board);
 }
 
@@ -75,7 +74,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    string line = "";
    char shot = 'x';
 
-   if(player == 1){
+   if(player == 1){//extract shot destination from opposing players board
       if(!p2_setup_board){//file not opened correctly
          try{
             throw 20;
@@ -145,24 +144,15 @@ int Server::process_shot(unsigned int player) {
          file.close();
 
          //open in truncating mode and erase proper shot file
-         if (player == 1){
-            file.open("src/shots/player_1.shot.json", ios::out | ios::trunc);
-            if(!file.is_open() || file.fail()){
+         file.open("src/shots/player_" + to_string(player) + ".shot.json", ios::out | ios::trunc);
+         if(!file.is_open() || file.fail()){
                file.close();
                cout << "\nError : Failed to erase file content!" << endl;
             }
-            file.close();
-         } else if (player == 2){
-            file.open("src/shots/player_2.shot.json", ios::out | ios::trunc);
-            if(!file.is_open() || file.fail()){
-               file.close();
-               cout << "\nError : Failed to erase file content!" << endl;
-            }
-            file.close();
-         }
+         file.close();
 
          buffer[filesize] = '\0'; //add null string to terminate
-         string line = buffer;
+         string line = buffer;//remove whitespaces from shot string
          line.erase(remove_if(line.begin(), line.end(), isSpace), line.end());
          cout << "trimmed shot string: " << line << endl;
 
@@ -181,16 +171,13 @@ int Server::process_shot(unsigned int player) {
 
          //pass info to evaluate_shot
          int result = evaluate_shot(player, xcoord, ycoord);
+         string resultJSON = "[{\"result\":" + to_string(result) + "}]";
          cout << "result: " << result << endl;
 
          //write to proper result file
-         if (player == 1){
-            resultFile.open("src/results/player_1.result.json", ios::out);
-         } else if (player == 1){
-            resultFile.open("src/results/player_2.result.json", ios::out);
-         }
+         resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
          if(resultFile.is_open()){
-            resultFile << result;
+            resultFile << resultJSON << "\n";
             resultFile.close();
          } else {
             printf("\nError : couldn't open result file for %d", player);
@@ -198,11 +185,7 @@ int Server::process_shot(unsigned int player) {
          return SHOT_FILE_PROCESSED;
       }
    } else {//file error handling
-      try{
-         throw "Error opening file";
-      } catch(string e) {
-         cout << e << endl;
-      }
+      cout << "Error opening file" << endl;
    }
    return NO_SHOT_FILE;
 }
