@@ -175,7 +175,7 @@ int Server::process_shot(unsigned int player) {
          cout << "result: " << result << endl;
 
          //write to proper result file
-         resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
+         resultFile.open("src/results/player_" + to_string(player) + ".result.json", ios::out);
          if(resultFile.is_open()){
             resultFile << resultJSON << "\n";
             resultFile.close();

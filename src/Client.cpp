@@ -23,13 +23,16 @@ Client::~Client() {
 
 void Client::initialize(unsigned int player, unsigned int board_size){
     this->player = player;//assign all attributes
-    this->board_name = "player_" + to_string(player) + ".action_board.json";
+    this->board_name = "../../src/actionBoards/player_" + to_string(player) + ".action_board.json";
     this->board_size = board_size;
     this->initialized = true;
-    fstream action_board;
+    ofstream action_board;
     action_board.open(board_name, ios::out);//create and open action board file
     if(!action_board){//file error handling
         cout << "Error : Action board not created properly" << endl;
+        this->initialized = false;
+    } else {
+        action_board.close();
     }
 }
 
@@ -38,8 +41,8 @@ void Client::fire(unsigned int x, unsigned int y) {
     fstream shot_file; // declare and open shot file and shot string
     string shot;
     shot = "[{\"x\":" + to_string(x) + ", \"y\":" + to_string(y) + "}]";
-    shot_file.open("player_" + to_string(this->player) + ".shot.json", ios::out);
-    if(!shot_file){//write contents of shot string
+    shot_file.open("../../src/shots/player_" + to_string(this->player) + ".shot.json", ios::out);
+    if(shot_file){//write contents of shot string
         shot_file << shot;
     } else {
         cout << "Error : shot file not opened properly" << endl;
@@ -50,7 +53,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 bool Client::result_available() {
     ifstream result_file;
     int file_size;
-    result_file.open("player_" + to_string(this->player) + ".result.json", ios::in);
+    result_file.open("../../src/results/player_" + to_string(this->player) + ".result.json", ios::in);
     if(!result_file){//result file does not exist
         cout << "Result file not found..." << endl;
         result_file.close();
@@ -75,7 +78,7 @@ int Client::get_result() {
     ifstream result_file;
     char result;
     string line = "";
-    result_file.open("player_" + to_string(this->player) + ".result.json");
+    result_file.open("../../src/results/player_" + to_string(this->player) + ".result.json");
     std::getline(result_file, line);
     result_file.close();
     for(int i = 0; i < line.size(); i++){//extract result
@@ -93,14 +96,31 @@ int Client::get_result() {
         }
     }
     cout << "Error : file not in JSON format (i.e. a colon wasn't found)" << endl;
+    return OUT_OF_BOUNDS;
 }
 
 
 
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
+    if(result == 0){// out of bounds
+        cout << "Skipping action board update, as shot is OOB" << endl;
+    } else {//valid shot, update json file
+        fstream action_board;
+        string board_string = "";
+        string line = "";
+        int position = 0;
+        action_board.open(board_name, ios::in);
+        if(action_board){
+            for(int i = 0; i <= board_size; i++){
+                getline(action_board, line);
+                board_string = board_string + line + '\n';
+            }
+            cout << "action Board loaded from board on file:" << endl << board_string << endl;
+        }
+    }
 }
 
 
 string Client::render_action_board(){
-    return "";
+    return "this is the rendered action board";
 }
