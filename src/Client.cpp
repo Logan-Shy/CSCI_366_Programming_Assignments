@@ -156,6 +156,7 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
                 board_string = board_string + line + '\n';
             }
             cout << "action Board loaded from board on file:" << endl << board_string << endl;
+            action_board.close();
         } else {
             cout << "Error : couldn't open action_board" << endl;
         }
