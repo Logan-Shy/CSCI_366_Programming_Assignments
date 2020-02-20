@@ -42,11 +42,23 @@ void Client::initialize(unsigned int player, unsigned int board_size){
     this->board_size = board_size;
     this->initialized = true;
     ofstream action_board;
-    action_board.open(board_name, ios::out);//create and open action board file
+    string default_board = "{";
+    for(int i = 0; i < board_size; i++){
+        if(i != 0){
+            default_board = default_board + ",\n";
+        }
+        default_board = default_board + 
+        "\"" + to_string(i) + "\":[{\"x0\":\"_\"},{\"x1\":\"_\"},{\"x2\":\"_\"},{\"x3\":\"_\"},"
+                                "{\"x4\":\"_\"},{\"x5\":\"_\"},{\"x6\":\"_\"},{\"x7\":\"_\"},"
+                                "{\"x8\":\"_\"},{\"x9\":\"_\"}]";
+    }
+    default_board = default_board + "}";
+    action_board.open(board_name, ios::out | ios::trunc);//create and open action board file
     if(!action_board){//file error handling
         cout << "Error : Action board not created properly" << endl;
         this->initialized = false;
     } else {
+        action_board << default_board;
         action_board.close();
     }
 }
@@ -139,11 +151,13 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
         int position = 0;
         action_board.open(board_name, ios::in);
         if(action_board){
-            for(int i = 0; i <= board_size; i++){
+            for(int i = 0; i < board_size; i++){
                 getline(action_board, line);
                 board_string = board_string + line + '\n';
             }
             cout << "action Board loaded from board on file:" << endl << board_string << endl;
+        } else {
+            cout << "Error : couldn't open action_board" << endl;
         }
     }
 }
