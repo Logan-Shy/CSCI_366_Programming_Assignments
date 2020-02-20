@@ -58,5 +58,6 @@ build/*
 CMakeCache.txt
 CMakeFiles/*
 src/shots/*
+src/actionBoards/*
 src/results/*
 *.result.json
