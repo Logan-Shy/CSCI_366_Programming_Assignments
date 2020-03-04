@@ -74,9 +74,9 @@ void Server::initialize(unsigned int board_size,
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    
    if (player > 2 || player < 1) {//Check if player number and shot are within bounds
-      return OUT_OF_BOUNDS;
+      throw 20;
    } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
-      return OUT_OF_BOUNDS;
+      throw 20;
    }
 
    string line = "";
