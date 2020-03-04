@@ -153,10 +153,33 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
         if(action_board){
             for(int i = 0; i < board_size; i++){
                 getline(action_board, line);
+                if(i == y){//update shot as we read in file
+                    for(int j = 0; j < line.size(); j++){
+                        if (line[j] == 'x'){
+                            cout << "found shot in action board" << endl;
+                            cout << "current position: " << line[j + 1] << endl;
+                            if ( (((int)line[j + 1]) - 48) == x){
+                                line[j + 5] = (char)0;
+                                line.insert(j + 5, to_string(result));
+                                cout << "just wrote result to action board" << endl;
+                            }
+                        }
+                    }
+                }
                 board_string = board_string + line + '\n';
             }
             cout << "action Board loaded from board on file:" << endl << board_string << endl;
             action_board.close();
+            cout << "writing result to action board:" << endl;
+            action_board.open(board_name, ios::out | ios::trunc);
+            if(action_board){
+                action_board << board_string;
+                action_board.close();
+                cout << "result written to action board" << endl;
+            } else {
+                cout << "Error : couldn't write result to action board" << endl;
+                action_board.close();
+            }
         } else {
             cout << "Error : couldn't open action_board" << endl;
         }
@@ -165,5 +188,30 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
 
 string Client::render_action_board(){
-    return "this is the rendered action board \n";
+    string returnStr = "";
+    string line = "";
+    ifstream actionBoard;
+    actionBoard.open(this->board_name, ios::in);
+    if (actionBoard){
+        while(std::getline(actionBoard, line)){
+            for(int i = 0; i < line.size(); i++){
+                if(line[i] == ':'){
+                    if(line[i + 2] == '_'){
+                        returnStr = returnStr + "_ ";
+                    } else if(line[i + 2] == '1'){
+                        returnStr = returnStr + "1 ";
+                    } else if(line[i + 2] == '-' || line[i + 3] == '1'){
+                        returnStr = returnStr + "-1 ";
+                    }
+                }
+            }
+            returnStr = returnStr + "\n";
+        }
+        actionBoard.close();
+        returnStr = returnStr + "\n";
+    } else {
+        cout << "Error : Couldn't open action board to render" << endl;
+    }
+    
+    return returnStr;
 }
