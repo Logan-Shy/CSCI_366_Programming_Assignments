@@ -57,9 +57,17 @@ void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
    //Assign board sizes and open setup boards
-   this->board_size = board_size;
-   this->p1_setup_board.open(p1_setup_board);
-   this->p2_setup_board.open(p2_setup_board);
+   if(board_size < BOARD_SIZE){
+      throw 20;
+   } else {
+      this->board_size = board_size;
+   }
+   if(p1_setup_board.length() <= 1 || p2_setup_board.length() <= 1){
+      throw 20;
+   } else{
+      this->p1_setup_board.open(p1_setup_board);
+      this->p2_setup_board.open(p2_setup_board);
+   }
 }
 
 
