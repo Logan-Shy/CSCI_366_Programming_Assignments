@@ -57,7 +57,5 @@ cmake-build-debug/*
 build/*
 CMakeCache.txt
 CMakeFiles/*
-src/shots/*
+src/player_*.*.json
 src/actionBoards/*
-src/results/*
-*.result.json
