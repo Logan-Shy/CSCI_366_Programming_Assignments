@@ -72,9 +72,10 @@ void Client::fire(unsigned int x, unsigned int y) {
                           "    \"y\": " + to_string(y) + "\n"
                           "}";
 
-    shot_file.open("src/shots/player_" + to_string(this->player) + ".shot.json", ios::out);
+    shot_file.open("src/player_" + to_string(this->player) + ".shot.json", ios::out);
     if(shot_file){//write contents of shot string
         shot_file << shot;
+        shot_file.close();
     } else {
         cout << "Error : shot file not opened properly" << endl;
     }
@@ -84,7 +85,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 bool Client::result_available() {
     fstream result_file;
     int file_size;
-    result_file.open("src/results/player_" + to_string(this->player) + ".result.json", ios::in);
+    result_file.open("src/player_" + to_string(this->player) + ".result.json", ios::in);
     if(!result_file){//result file does not exist
         cout << "Result file not found..." << endl;
         // result_file.close();
@@ -108,17 +109,42 @@ bool Client::result_available() {
 int Client::get_result() {
     ifstream result_file;
     int result;
-    string line = "";
-    result_file.open("src/results/player_" + to_string(this->player) + ".result.json");
+    string boardName = "src/player_" + to_string(this->player) + ".result.json";
+    result_file.open(boardName, ios::in);
     if(result_file){
         cereal::JSONInputArchive archive(result_file);
         archive(result);
         cout <<"\n\nresult: " + to_string(result) << endl << endl;
-        return result;
     } else {
         cout << "Error : couldn't open result file" << endl;
-        return OUT_OF_BOUNDS;
+        return -1;
     }
+    result_file.close();
+
+    if(result == 999){
+        try{
+            throw "bad stuf";
+        } catch(exception e){
+            cout << "exception occurred" << endl;
+        }
+        return -1;
+    }
+    
+    if(this->player == 1){
+        if(remove("src/player_1.result.json") != 0){
+            cout << "Couldn't remove result file" << endl;
+        } else{
+            cout << "removed result file" << endl;
+        }
+    } else if(this->player == 2){
+        if(remove("src/player_2.result.json") != 0){
+            cout << "Couldn't remove result file" << endl;
+        } else{
+            cout << "removed result file" << endl;
+        }
+    }
+    
+    return result;
 }
 
 

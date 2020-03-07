@@ -58,12 +58,20 @@ void Server::initialize(unsigned int board_size,
                         string p2_setup_board){
    //Assign board sizes and open setup boards
    if(board_size < BOARD_SIZE){
-      throw 20;
+      try{
+         throw "File not opened properly";
+      } catch(string e){
+         cout << e << endl;
+      }
    } else {
       this->board_size = board_size;
    }
    if(p1_setup_board.length() <= 1 || p2_setup_board.length() <= 1){
-      throw 20;
+      try{
+         throw "File not opened properly";
+      } catch(string e){
+         cout << e << endl;
+      }
    } else{
       this->p1_setup_board.open(p1_setup_board);
       this->p2_setup_board.open(p2_setup_board);
@@ -74,9 +82,19 @@ void Server::initialize(unsigned int board_size,
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    
    if (player > 2 || player < 1) {//Check if player number and shot are within bounds
-      throw 20;
+      try{
+         throw 20;
+      } catch(exception e){
+         cout <<"Exception occurred" << endl;
+      }
+      return NO_SHOT_FILE;
    } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
-      throw 20;
+      try{
+         throw "exception";
+      } catch(exception e){
+         cout <<"Exception occurred" << endl;
+      }
+      return NO_SHOT_FILE;
    }
 
    string line = "";
@@ -90,9 +108,10 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
             cout << e << endl;
          }
       } else {
-         for(int i = 0; i < y; i++){
+         for(int i = 0; i <= y; i++){
             getline(p2_setup_board, line);
          }
+         cout << "character on player board at shot position: " << line[x] << endl;
          shot = line[x];
       }
    } else if(player == 2){
@@ -103,9 +122,10 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
             cout << e << endl;
          }
       } else {
-         for(int i = 0; i < y; i++){
+         for(int i = 0; i <= y; i++){
             getline(p1_setup_board, line);
          }
+         cout << "character on player board at shot position: " << line[x] << endl;
          shot = line[x];
       }
    }
@@ -126,74 +146,64 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
 
 int Server::process_shot(unsigned int player) {
+   if(player > 2 || player < 1){
+      try{
+         throw 20;
+      } catch(exception e){
+         cout << "exception occurred" << endl;
+      }
+      return NO_SHOT_FILE;
+   }
+   
    int filesize = 0;
-   ifstream file;
+   ifstream shotFile;
    ofstream resultFile;
+   string boardName = "src/player_" + to_string(player) + ".shot.json";
    int xcoord, ycoord = -1; //initialize coordinates to something not expected
 
+   shotFile.open(boardName, ios::in);
 
-   if(player == 1){
-      file.open("src/shots/player_1.shot.json", ios::in);
-   } else if (player == 2) {
-      file.open("src/shots/player_2.shot.json", ios::in);
-   }
-
-   if (file) {//file exists and is open
-      filesize = get_file_length(&file);
+   if (shotFile) {//file exists and is open
+      filesize = get_file_length(&shotFile);
       printf("shot filesize from player %d: %d\n", player, filesize);
-      file.seekg(0, ios::beg);
-      file.clear();
-      if (filesize < 3) {
-         file.close();
-         return NO_SHOT_FILE;
-      } else { //file is large enough to extract coordinates
-         char *buffer = new char [filesize + 1];
-         file.read(buffer, filesize);
-         file.close();
+      shotFile.seekg(0, ios::beg);
+      shotFile.clear();
+      if (filesize > 3) {//file large enough to be read from
+         cereal::JSONInputArchive archive(shotFile);
+         archive(xcoord);
+         archive(ycoord);
+         shotFile.close();
 
-         //open in truncating mode and erase proper shot file
-         file.open("src/shots/player_" + to_string(player) + ".shot.json", ios::out | ios::trunc);
-         if(!file.is_open() || file.fail()){
-               file.close();
-               cout << "\nError : Failed to erase file content!" << endl;
-            }
-         file.close();
-
-         buffer[filesize] = '\0'; //add null string to terminate
-         string line = buffer;//remove whitespaces from shot string
-         line.erase(remove_if(line.begin(), line.end(), isSpace), line.end());
-         cout << "trimmed shot string: " << line << endl;
-
-         delete[] buffer;
-         
-         for(int i = 0; i < line.size(); i++){//extract coordinates
-            if(line[i] == 'x'){
-               cout << "x coord: " << line[i + 3] << endl;
-               xcoord = (int)line[i + 3] - 48;
-            }
-            if(line[i] == 'y'){
-               cout << "y coord: " << line[i + 3] << endl;
-               ycoord = (int)line[i + 3] - 48;
-            }
+         if(remove(boardName.c_str()) != 0){
+            cout << "Error : couldn't remove shot file" << endl;
+         } else {
+            cout << "removed player " << player << " shot file" << endl;
          }
+
+         cout << "\nxcoord: " + to_string(xcoord) + "\nycoord: " + to_string(ycoord) << endl << endl;
 
          //pass info to evaluate_shot
          int result = evaluate_shot(player, xcoord, ycoord);
-         string resultJSON = "[{\"result\":" + to_string(result) + "}]";
+         string resultJSON = "{\n"
+                            "    \"result\": "+to_string(result)+"\n"
+                                                               "}";
          cout << "result: " << result << endl;
 
          //write to proper result file
-         resultFile.open("src/results/player_" + to_string(player) + ".result.json", ios::out);
+         resultFile.open("src/player_" + to_string(player) + ".result.json", ios::out);
          if(resultFile.is_open()){
-            resultFile << resultJSON << "\n";
+            resultFile << resultJSON;
             resultFile.close();
          } else {
             printf("\nError : couldn't open result file for %d", player);
          }
          return SHOT_FILE_PROCESSED;
+      } else { //file not large enough to extract coordinates
+         shotFile.close();
+         return NO_SHOT_FILE;
       }
    } else {//file error handling
-      cout << "Error opening file" << endl;
+      cout << "Error opening shot file" << endl;
    }
    return NO_SHOT_FILE;
 }
