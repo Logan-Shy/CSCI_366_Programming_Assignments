@@ -72,7 +72,7 @@ void Client::fire(unsigned int x, unsigned int y) {
                           "    \"y\": " + to_string(y) + "\n"
                           "}";
 
-    shot_file.open("src/player_" + to_string(this->player) + ".shot.json", ios::out);
+    shot_file.open("player_" + to_string(this->player) + ".shot.json", ios::out);
     if(shot_file){//write contents of shot string
         shot_file << shot;
         shot_file.close();
@@ -85,7 +85,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 bool Client::result_available() {
     fstream result_file;
     int file_size;
-    result_file.open("src/player_" + to_string(this->player) + ".result.json", ios::in);
+    result_file.open("player_" + to_string(this->player) + ".result.json", ios::in);
     if(!result_file){//result file does not exist
         cout << "Result file not found..." << endl;
         // result_file.close();
@@ -109,7 +109,7 @@ bool Client::result_available() {
 int Client::get_result() {
     ifstream result_file;
     int result;
-    string boardName = "src/player_" + to_string(this->player) + ".result.json";
+    string boardName = "player_" + to_string(this->player) + ".result.json";
     result_file.open(boardName, ios::in);
     if(result_file){
         cereal::JSONInputArchive archive(result_file);
@@ -131,13 +131,13 @@ int Client::get_result() {
     }
     
     if(this->player == 1){
-        if(remove("src/player_1.result.json") != 0){
+        if(remove("player_1.result.json") != 0){
             cout << "Couldn't remove result file" << endl;
         } else{
             cout << "removed result file" << endl;
         }
     } else if(this->player == 2){
-        if(remove("src/player_2.result.json") != 0){
+        if(remove("player_2.result.json") != 0){
             cout << "Couldn't remove result file" << endl;
         } else{
             cout << "removed result file" << endl;

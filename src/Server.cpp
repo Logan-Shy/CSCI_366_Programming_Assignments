@@ -82,19 +82,10 @@ void Server::initialize(unsigned int board_size,
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    
    if (player > 2 || player < 1) {//Check if player number and shot are within bounds
-      try{
-         throw 20;
-      } catch(exception e){
-         cout <<"Exception occurred" << endl;
-      }
-      return NO_SHOT_FILE;
+      throw std::runtime_error(string("Failed: player OOB"));
+      // return OUT_OF_BOUNDS;
    } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
-      try{
-         throw "exception";
-      } catch(exception e){
-         cout <<"Exception occurred" << endl;
-      }
-      return NO_SHOT_FILE;
+      return OUT_OF_BOUNDS;
    }
 
    string line = "";
@@ -103,7 +94,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    if(player == 1){//extract shot destination from opposing players board
       if(!p2_setup_board){//file not opened correctly
          try{
-            throw 20;
+            // throw 20;
          } catch(int e){
             cout << e << endl;
          }
@@ -117,7 +108,7 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    } else if(player == 2){
       if(!p1_setup_board){//file2 not opened properly
          try{
-            throw 20;
+            // throw 20;
          } catch(int e){
             cout << e << endl;
          }
@@ -130,10 +121,8 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
       }
    }
 
-   try {
-      if (shot == 'x') throw "Something went wrong";
-   } catch (string e) {
-      cout << e;
+   if(shot == 'x'){
+      return OUT_OF_BOUNDS;
    }
 
    if (shot == '_') {
@@ -146,20 +135,24 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 
 
 int Server::process_shot(unsigned int player) {
-   if(player > 2 || player < 1){
-      try{
-         throw 20;
-      } catch(exception e){
-         cout << "exception occurred" << endl;
-      }
-      return NO_SHOT_FILE;
-   }
    
    int filesize = 0;
    ifstream shotFile;
    ofstream resultFile;
-   string boardName = "src/player_" + to_string(player) + ".shot.json";
+   string boardName = "player_" + to_string(player) + ".shot.json";
    int xcoord, ycoord = -1; //initialize coordinates to something not expected
+
+   if(player > 2 || player < 1){
+      string missJSON = "{\n    \"result\": 0\n}";
+      resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
+      if(resultFile.is_open()){
+         resultFile << missJSON;
+         resultFile.close();
+      } else {
+         printf("\nError : couldn't open result file for %d", player);
+      }
+      return SHOT_FILE_PROCESSED;
+   }
 
    shotFile.open(boardName, ios::in);
 
@@ -190,7 +183,7 @@ int Server::process_shot(unsigned int player) {
          cout << "result: " << result << endl;
 
          //write to proper result file
-         resultFile.open("src/player_" + to_string(player) + ".result.json", ios::out);
+         resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
          if(resultFile.is_open()){
             resultFile << resultJSON;
             resultFile.close();
