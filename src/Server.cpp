@@ -143,15 +143,7 @@ int Server::process_shot(unsigned int player) {
    int xcoord, ycoord = -1; //initialize coordinates to something not expected
 
    if(player > 2 || player < 1){
-      string missJSON = "{\n    \"result\": 0\n}";
-      resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
-      if(resultFile.is_open()){
-         resultFile << missJSON;
-         resultFile.close();
-      } else {
-         printf("\nError : couldn't open result file for %d", player);
-      }
-      return SHOT_FILE_PROCESSED;
+      throw std::runtime_error(string("Failed: player OOB"));
    }
 
    shotFile.open(boardName, ios::in);
@@ -188,6 +180,7 @@ int Server::process_shot(unsigned int player) {
             resultFile << resultJSON;
             resultFile.close();
          } else {
+            throw std::runtime_error(string("Failed: player OOB"));
             printf("\nError : couldn't open result file for %d", player);
          }
          return SHOT_FILE_PROCESSED;
