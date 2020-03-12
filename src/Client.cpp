@@ -72,7 +72,7 @@ void Client::fire(unsigned int x, unsigned int y) {
                           "    \"y\": " + to_string(y) + "\n"
                           "}";
 
-    shot_file.open("player_" + to_string(this->player) + ".shot.json", ios::out);
+    shot_file.open("test/player_" + to_string(this->player) + ".shot.json", ios::out);
     if(shot_file){//write contents of shot string
         shot_file << shot;
         shot_file.close();
@@ -85,7 +85,7 @@ void Client::fire(unsigned int x, unsigned int y) {
 bool Client::result_available() {
     fstream result_file;
     int file_size;
-    result_file.open("player_" + to_string(this->player) + ".result.json", ios::in);
+    result_file.open("test/player_" + to_string(this->player) + ".result.json", ios::in);
     if(!result_file){//result file does not exist
         cout << "Result file not found..." << endl;
         // result_file.close();
@@ -114,31 +114,28 @@ int Client::get_result() {
     if(result_file){
         cereal::JSONInputArchive archive(result_file);
         archive(result);
-        cout <<"\n\nresult: " + to_string(result) << endl << endl;
+        cout << "Successfully opened and wrote to result = " + to_string(result)+" to file" << endl;
     } else {
-        cout << "Error : couldn't open result file" << endl;
-        return -1;
+        throw std::runtime_error("Couldn't open result file");
     }
     result_file.close();
 
-    if(result == 999){
-        try{
-            throw "bad stuf";
-        } catch(exception e){
-            cout << "exception occurred" << endl;
-        }
+    if(result > 1 || result < -1){
+        throw std::runtime_error("result out of bounds");
         return -1;
     }
     
     if(this->player == 1){
         if(remove("player_1.result.json") != 0){
             cout << "Couldn't remove result file" << endl;
+            throw std::runtime_error("Couldn't remove result file");
         } else{
             cout << "removed result file" << endl;
         }
     } else if(this->player == 2){
         if(remove("player_2.result.json") != 0){
             cout << "Couldn't remove result file" << endl;
+            throw std::runtime_error("Couldn't remove result file");
         } else{
             cout << "removed result file" << endl;
         }
@@ -164,8 +161,6 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
                 if(i == y){//update shot as we read in file
                     for(int j = 0; j < line.size(); j++){
                         if (line[j] == 'x'){
-                            cout << "found shot in action board" << endl;
-                            cout << "current position: " << line[j + 1] << endl;
                             if ( (((int)line[j + 1]) - 48) == x){
                                 line[j + 5] = (char)0;
                                 line.insert(j + 5, to_string(result));
@@ -176,20 +171,18 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
                 }
                 board_string = board_string + line + '\n';
             }
-            cout << "action Board loaded from board on file:" << endl << board_string << endl;
+            cout << "action Board loaded from board on file\nwriting result to action board..." << endl;
             action_board.close();
-            cout << "writing result to action board:" << endl;
             action_board.open(board_name, ios::out | ios::trunc);
             if(action_board){
                 action_board << board_string;
                 action_board.close();
                 cout << "result written to action board" << endl;
             } else {
-                cout << "Error : couldn't write result to action board" << endl;
-                action_board.close();
+                throw std::runtime_error("Couldn't open action board");
             }
         } else {
-            cout << "Error : couldn't open action_board" << endl;
+            throw std::runtime_error("Couldn't open action board");
         }
     }
 }
@@ -218,7 +211,7 @@ string Client::render_action_board(){
         actionBoard.close();
         returnStr = returnStr + "\n";
     } else {
-        cout << "Error : Couldn't open action board to render" << endl;
+        throw std::runtime_error("Couldn't open action board");
     }
     
     return returnStr;

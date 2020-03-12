@@ -17,16 +17,6 @@
 
 #include "common.hpp"
 #include "Server.hpp"
-/**
- * helper function to determine if a given character
- * is a whitespace.
- * @param c - character to be checked
- * @return boolean if character is a whitespace
- */
-bool isSpace(unsigned char c){
-   return (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f');
-}
-
 
 /**
  * Calculate the length of a file (helper function)
@@ -83,7 +73,6 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
    
    if (player > 2 || player < 1) {//Check if player number and shot are within bounds
       throw std::runtime_error(string("Failed: player OOB"));
-      // return OUT_OF_BOUNDS;
    } else if ((x > 9 || x < 0) || (y > 9 || y < 0)) {
       return OUT_OF_BOUNDS;
    }
@@ -172,16 +161,16 @@ int Server::process_shot(unsigned int player) {
          string resultJSON = "{\n"
                             "    \"result\": "+to_string(result)+"\n"
                                                                "}";
-         cout << "result: " << result << endl;
 
          //write to proper result file
-         resultFile.open("player_" + to_string(player) + ".result.json", ios::out);
-         if(resultFile.is_open()){
+         cout << "Writing result = " << result << " to proper result file..." << endl;
+         resultFile.open("test/player_" + to_string(player) + ".result.json", ios::out);
+         if(resultFile){
             resultFile << resultJSON;
+            cout << "Successfully wrote to File" << endl;
             resultFile.close();
          } else {
-            throw std::runtime_error(string("Failed: player OOB"));
-            printf("\nError : couldn't open result file for %d", player);
+            throw std::runtime_error(string("Failed: couldn't write to result file"));
          }
          return SHOT_FILE_PROCESSED;
       } else { //file not large enough to extract coordinates
